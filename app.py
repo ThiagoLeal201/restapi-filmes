@@ -1,13 +1,5 @@
 from flask import Flask, jsonify, request
-import mysql.connector
-
-db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'admin',
-    'database': 'filmes',
-    'auth_plugin': 'mysql_native_password'
-}
+from db import conectar_banco
 
 app = Flask(__name__)
 
@@ -15,7 +7,7 @@ app = Flask(__name__)
 ## GET EM TODOS OS FILMES
 @app.route('/filmes', methods=['GET'])
 def busca_filmes():
-    conn = mysql.connector.connect(**db_config)
+    conn = conectar_banco()
     cursor = conn.cursor(dictionary=True)
     cursor.execute('SELECT * FROM filmes')
     filmes = cursor.fetchall()
@@ -27,7 +19,7 @@ def busca_filmes():
 ## GET NO ID
 @app.route('/filmes/<int:id>', methods=['GET'])
 def busca_filme_id(id):
-    conn = mysql.connector.connect(**db_config)
+    conn = conectar_banco()
     cursor = conn.cursor(dictionary=True)
     query = 'SELECT * FROM filmes WHERE id = %s'
     cursor.execute(query, (id,))
@@ -49,7 +41,7 @@ def cria_filme():
     streaming = data['streaming']
 
     # Criação no banco
-    conn = mysql.connector.connect(**db_config)
+    conn = conectar_banco()
     cursor = conn.cursor()
     query = 'INSERT INTO filmes (nome, autor, streaming) VALUES (%s, %s, %s)'
     cursor.execute(query, (nome, autor, streaming))
@@ -61,8 +53,3 @@ def cria_filme():
     conn.close()
 
     return jsonify({'id': filme_id, 'nome': nome, 'autor': autor, 'streaming': streaming}), 201
-
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
