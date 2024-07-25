@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from db import conectar_banco
+from application.db import conectar_banco
 
 app = Flask(__name__)
 
